@@ -1,0 +1,16 @@
+{
+  "name": "alexa-menu-skill",
+  "version": "1.0.0",
+  "description": "Alexa skill to repeat a menu entry from a preset menu.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "Jeff Oliver <kaiserfro@yahoo.com>",
+  "license": "MIT",
+  "dependencies": {
+    "datejs": "^1.0.0-rc3",
+    "moment": "^2.11.2"
+  }
+}
