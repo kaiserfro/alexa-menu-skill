@@ -58,12 +58,13 @@ var MenuSkill = function () {
 };
 
 MenuSkill.prototype = Object.create(AlexaSkill.prototype);
-MenuSkill.prototype = MenuSkill;
+MenuSkill.prototype.constructor = MenuSkill;
 
 MenuSkill.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) {
     console.log('MenuSkill onLaunch requestId: ' + launchRequest.requestId + ', sessionId: ' + session.sessionId);
 
-    handleGetDateIntent(session, response);
+    var speechText = 'Welcome to the menu helper.  You can ask, what is the menu for today.';
+    response.ask(speechText, speechText);
 };
 
 MenuSkill.prototype.intentHandlers = {
@@ -98,4 +99,9 @@ MenuSkill.prototype.intentHandlers = {
     'AMAZON.CancelIntent': function (intent, session, response) {
         response.tell('Goodbye.');
     }
+};
+
+exports.handler = function (event, context) {
+    var menuSkill = new MenuSkill();
+    menuSkill.execute(event, context);
 };
