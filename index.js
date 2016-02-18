@@ -2,7 +2,7 @@ require('datejs');  // This extends the date object.
 var moment = require('moment');
 var AlexaSkill = require('./AlexaSkill');
 
-var APP_ID = undefined;
+var APP_ID = 'amzn1.echo-sdk-ams.app.13dd790c-0fda-494c-ba6a-cf2805dc33e0';
 
 var menu = {
     "2016-02-01": "mini cheeseburger, kickin ranch goldfish",
@@ -60,7 +60,7 @@ var MenuSkill = function () {
 MenuSkill.prototype = Object.create(AlexaSkill.prototype);
 MenuSkill.prototype = MenuSkill;
 
-MenuSkill.prototype.evenHandlers.onLaunch = function (launchRequest, session, response) {
+MenuSkill.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) {
     console.log('MenuSkill onLaunch requestId: ' + launchRequest.requestId + ', sessionId: ' + session.sessionId);
 
     handleGetDateIntent(session, response);
