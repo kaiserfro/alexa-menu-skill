@@ -1,5 +1,5 @@
 require('datejs');  // This extends the date object.
-var moment = require('./moment');
+var moment = require('moment');
 var AlexaSkill = require('./AlexaSkill');
 
 var APP_ID = undefined;
