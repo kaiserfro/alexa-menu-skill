@@ -69,14 +69,14 @@ MenuSkill.prototype.eventHandlers.onLaunch = function (launchRequest, session, r
 
 MenuSkill.prototype.intentHandlers = {
     GetDateIntent: function (intent, session, response) {
-        var daySlot = intent.slots.day;
-        var response = getMenu(daySlot);
-        var cardTitle = 'Menu for ' + response.date;
+        var daySlot = intent.slots.day.value;
+        var menu = getMenu(daySlot);
+        var cardTitle = 'Menu for ' + menu.date;
         var speechOutput = {
-            speech: response.speech,
+            speech: menu.speech,
             type: AlexaSkill.speechOutputType.PLAIN_TEXT
         };
-        response.tellWithCard(speechOutput, cardTitle, response.speech);
+        response.tellWithCard(speechOutput, cardTitle, menu.speech);
     },
 
     'AMAZON.HelpIntent': function (intent, session, response) {
