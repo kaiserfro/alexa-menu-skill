@@ -10,6 +10,7 @@
   "author": "Jeff Oliver <kaiserfro@yahoo.com>",
   "license": "MIT",
   "dependencies": {
+    "aws-sdk": "^2.2.40",
     "datejs": "^1.0.0-rc3",
     "moment": "^2.11.2"
   }

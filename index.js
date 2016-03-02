@@ -1,49 +1,45 @@
 require('datejs');  // This extends the date object.
 var moment = require('moment');
+var AWS = require('aws-sdk');
 var AlexaSkill = require('./AlexaSkill');
 
 var APP_ID = 'amzn1.echo-sdk-ams.app.13dd790c-0fda-494c-ba6a-cf2805dc33e0';
 
-var menu = {
-    "2016-02-01": "mini cheeseburger, kickin ranch goldfish",
-    "2016-02-02": "round pepperoni pizza",
-    "2016-02-03": "popcorn chicken and mashed potatoes with biscuit, chocolate chip chortles",
-    "2016-02-04": "mini corndogs with potato wedges and rips",
-    "2016-02-05": "general tso chicken over brown rice, fortune cookie",
-    "2016-02-09": "pepperoni and cheese stuffed sticks, state capital cookie",
-    "2016-02-10": "bacon cheeseburger, chocolate chip cookie",
-    "2016-02-11": "teriyaki chicken over brown rice, fortune cookie",
-    "2016-02-12": "heart chicken nuggets with potato wedges, sweet heart icee",
-    "2016-02-16": "round pepperoni pizza, president cookie",
-    "2016-02-17": "double dogs with baked chips",
-    "2016-02-18": "chicken strips with potato wedges, scooby crackers",
-    "2016-02-19": "pasta with meatballs, frozen fruit cup",
-    "2016-02-22": "big bean and cheese burrito with baked chips",
-    "2016-02-23": "pepperoni and cheese stuffed sticks",
-    "2016-02-24": "cheese enchilada, all sport vanilla cookie",
-    "2016-02-25": "chicken patty sandwich on a whole grain bun, chocolate brownie",
-    "2016-02-26": "beef bar b. cue sandwich, sour fruit juice icee",
-}
+AWS.config.loadFromPath('./config.json');
+var docClient = new AWS.DynamoDB.DocumentClient();
 
-function getMenu(day) {
+function getMenu(day, callback) {
     var reqDate = moment(Date.parse(day));
-    var response = '';
 
     var longDate = reqDate.format('dddd, MMMM Do');
     var lookupDate = reqDate.format('YYYY-MM-DD');
-    if (lookupDate in menu) {
-        var menuItem = menu[lookupDate];
-        return {
-            date: longDate,
-            speech: 'The menu for ' + longDate + ' has ' + menuItem
-        };
-    }
-    else {
-        return {
-            date: longDate,
-            speech: 'There is no menu for ' + longDate
-        };
-    }
+    console.log(longDate);
+    console.log(lookupDate);
+    docClient.get({
+        TableName: 'MenuData',
+        Key: {
+            dateTs: lookupDate
+        }
+    }, function (err, data) {
+        console.log(err, data);
+        if (err) {
+            console.log(err, err.stack);
+            callback(err);
+        }
+        else if (data.Item === undefined) {
+            callback(null, {
+                date: longDate,
+                speech: 'There is no menu for ' + longDate
+            });
+        }
+        else {
+            var menuData = JSON.parse(data.Item.menu);
+            callback(null, {
+                date: longDate,
+                speech: 'The menu for ' + longDate + ' has ' + menuData.lunch
+            });
+        }
+    });
 }
 
 // console.log(getMenu('today'));
@@ -70,13 +66,14 @@ MenuSkill.prototype.eventHandlers.onLaunch = function (launchRequest, session, r
 MenuSkill.prototype.intentHandlers = {
     GetDateIntent: function (intent, session, response) {
         var daySlot = intent.slots.day.value;
-        var menu = getMenu(daySlot);
-        var cardTitle = 'Menu for ' + menu.date;
-        var speechOutput = {
-            speech: menu.speech,
-            type: AlexaSkill.speechOutputType.PLAIN_TEXT
-        };
-        response.tellWithCard(speechOutput, cardTitle, menu.speech);
+        getMenu(daySlot, function (err, menu) {
+            var cardTitle = 'Menu for ' + menu.date;
+            var speechOutput = {
+                speech: menu.speech,
+                type: AlexaSkill.speechOutputType.PLAIN_TEXT
+            };
+            response.tellWithCard(speechOutput, cardTitle, menu.speech);
+        });
     },
 
     'AMAZON.HelpIntent': function (intent, session, response) {
